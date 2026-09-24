@@ -177,7 +177,9 @@ Resource paths must be normalized and must never be allowed to escape the discov
 
 ## Web UI
 
-V1 includes a small management UI. The UI is only a control panel for repository sources; MCP clients continue to interact through the four tools above.
+V1 includes a small loopback-only management UI. The UI uses local HTTP only for browser management; it is not an MCP HTTP transport. MCP clients continue to interact exclusively through stdio and the four tools above.
+
+The default UI address is `http://127.0.0.1:3218/`. The port may be overridden with `SKILLS_MCP_UI_PORT`.
 
 The UI should provide:
 
@@ -192,13 +194,15 @@ The UI should provide:
 
 V1 does not require a database.
 
-Repository source configuration may initially be stored in a small JSON file managed by the server, for example:
+Repository source configuration is stored outside the installed npm package at:
 
 ```text
-data/config.json
+~/.skills-mcp/sources.json
 ```
 
-Persistence should be isolated behind a small interface so it can later be replaced without changing the MCP API.
+The base directory may be overridden with `SKILLS_MCP_DATA_DIR`.
+
+Persistence remains isolated behind a small interface so it can later be replaced without changing the MCP API.
 
 ## Freshness and Caching
 
@@ -241,10 +245,10 @@ The project must be configured for publication to npm.
 It should provide a CLI executable so users can run:
 
 ```bash
-npx skills-mcp
+npx @myriadcode/skills-mcp
 ```
 
-or, after a global install:
+or, after installing the package globally:
 
 ```bash
 skills-mcp
