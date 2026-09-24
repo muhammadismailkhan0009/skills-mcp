@@ -34,25 +34,22 @@ any MCP client
 
 Repositories are configured through the web UI, not hardcoded in source code.
 
-Each source contains:
+The user provides exactly one value when adding a source: a public GitHub repository URL, for example:
 
-- unique source ID
-- GitHub repository in `owner/repo` form
-- optional Git ref (branch, tag, or commit)
-- enabled/disabled state
-
-Example logical source:
-
-```json
-{
-  "id": "dev-skills",
-  "repository": "muhammadismailkhan0009/dev-skills",
-  "ref": "main",
-  "enabled": true
-}
+```text
+https://github.com/muhammadismailkhan0009/dev-skills
 ```
 
-V1 supports public GitHub repositories only. Private-repository authentication is intentionally out of scope.
+The server normalizes that URL to `owner/repo` form and derives a collision-safe internal source ID automatically. For example:
+
+```text
+repository: muhammadismailkhan0009/dev-skills
+internal source ID: muhammadismailkhan0009~dev-skills
+```
+
+The internal source ID is not a user-facing configuration field.
+
+V1 uses the repository's default branch and supports public GitHub repositories only. Private-repository authentication and custom refs are intentionally out of scope.
 ## Skill Discovery
 
 For every enabled repository, recursively inspect the repository tree for:
@@ -83,7 +80,7 @@ The canonical skill ID must therefore combine the source ID and repository-relat
 Example:
 
 ```text
-dev-skills/backend/java/spring/spring-api
+muhammadismailkhan0009~dev-skills/backend/java/spring/spring-api
 ```
 ## Skill Structure
 
@@ -137,7 +134,7 @@ Input:
 
 ```json
 {
-  "id": "dev-skills/backend/java/spring/spring-api"
+  "id": "muhammadismailkhan0009~dev-skills/backend/java/spring/spring-api"
 }
 ```
 
@@ -149,7 +146,7 @@ Input:
 
 ```json
 {
-  "id": "dev-skills/backend/java/spring/spring-data-jpa"
+  "id": "muhammadismailkhan0009~dev-skills/backend/java/spring/spring-data-jpa"
 }
 ```
 Example result:
@@ -168,7 +165,7 @@ Input:
 
 ```json
 {
-  "id": "dev-skills/backend/java/spring/spring-data-jpa",
+  "id": "muhammadismailkhan0009~dev-skills/backend/java/spring/spring-data-jpa",
   "path": "references/entity-mapping.md"
 }
 ```
@@ -177,19 +174,21 @@ Resource paths must be normalized and must never be allowed to escape the discov
 
 ## Web UI
 
-V1 includes a small loopback-only management UI. The UI uses local HTTP only for browser management; it is not an MCP HTTP transport. MCP clients continue to interact exclusively through stdio and the four tools above.
+V1 includes a small loopback-only React management UI built with standard shadcn/ui components. The UI uses local HTTP only for browser management; it is not an MCP HTTP transport. MCP clients continue to interact exclusively through stdio and the four tools above.
 
 The default UI address is `http://127.0.0.1:3218/`. The port may be overridden with `SKILLS_MCP_UI_PORT`.
 
-The UI should provide:
+The UI should stay deliberately simple:
 
+- one public GitHub repository URL input
 - repository list
-- add repository
 - remove repository
 - enable/disable repository
 - refresh repository
-- view discovered skills
+- view discovered skills inline
 - inspect a skill and its resources
+
+Users must not be asked to enter a source ID, `owner/repo` separately, or a Git ref.
 ## Persistence
 
 V1 does not require a database.
@@ -245,7 +244,7 @@ The project must be configured for publication to npm.
 It should provide a CLI executable so users can run:
 
 ```bash
-npx @myriadcodelabslabs/skills-mcp
+npx @myriadcodelabs/skills-mcp
 ```
 
 or, after installing the package globally:

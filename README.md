@@ -14,7 +14,7 @@ MCP transport is stdio only.
 ## Run
 
 ```bash
-npx @myriadcodelabslabs/skills-mcp
+npx @myriadcodelabs/skills-mcp
 ```
 
 The process also starts a loopback-only management UI at:
@@ -23,7 +23,15 @@ The process also starts a loopback-only management UI at:
 http://127.0.0.1:3218/
 ```
 
-The UI is only for local repository management; it is not an HTTP MCP transport.
+The UI is only for local repository management; it is not an HTTP MCP transport. It is a small React interface built with standard shadcn/ui components.
+
+To add a source, paste only the public GitHub repository URL, for example:
+
+```text
+https://github.com/muhammadismailkhan0009/dev-skills
+```
+
+The server derives its internal source identity automatically and uses the repository's default branch.
 ## Configuration
 
 Repository configuration is persisted at:
@@ -48,7 +56,7 @@ Example:
   "mcpServers": {
     "skills": {
       "command": "npx",
-      "args": ["-y", "@myriadcodelabslabs/skills-mcp"]
+      "args": ["-y", "@myriadcodelabs/skills-mcp"]
     }
   }
 }
@@ -76,7 +84,7 @@ https://github.com/muhammadismailkhan0009/skills-mcp
 npm package:
 
 ```text
-@myriadcodelabslabs/skills-mcp
+@myriadcodelabs/skills-mcp
 ```
 
 The repository includes:
@@ -110,7 +118,7 @@ git push -u origin main
 The npm package is scoped as:
 
 ```text
-@myriadcodelabslabs/skills-mcp
+@myriadcodelabs/skills-mcp
 ```
 
 You must own the `@myriadcodelabs` npm scope, either as your npm username or as an npm organization where you have publish permission. If you do not own that scope, change the package name before the first publish.
@@ -137,7 +145,7 @@ Using npm CLI requires npm 11.15.0 or newer:
 ```bash
 npm install --global "npm@^11.15.0"
 
-npm trust github @myriadcodelabslabs/skills-mcp \
+npm trust github @myriadcodelabs/skills-mcp \
   --repo muhammadismailkhan0009/skills-mcp \
   --file release.yml \
   --allow-publish
@@ -167,7 +175,7 @@ The release workflow will:
 1. install dependencies
 2. run typecheck, tests, build, and npm package verification
 3. verify that tag `v0.1.0` matches package version `0.1.0`
-4. detect that `@myriadcodelabslabs/skills-mcp@0.1.0` already exists on npm and skip duplicate publication
+4. detect that `@myriadcodelabs/skills-mcp@0.1.0` already exists on npm and skip duplicate publication
 5. create the GitHub Release with generated release notes
 
 ### Subsequent releases

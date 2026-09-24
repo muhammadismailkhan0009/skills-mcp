@@ -1,4 +1,4 @@
-import { mkdtemp } from "node:fs/promises";
+import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
@@ -36,10 +36,21 @@ class FakeReader implements RepositoryReader {
 
 async function createUi() {
   const dir = await mkdtemp(path.join(os.tmpdir(), "skills-mcp-ui-"));
+  const staticDirectory = path.join(dir, "web");
+  await mkdir(staticDirectory, { recursive: true });
+  await writeFile(
+    path.join(staticDirectory, "index.html"),
+    "<!doctype html><title>skills-mcp</title><div>skills-mcp</div>",
+    "utf8",
+  );
+
   const store = new SourceStore(path.join(dir, "sources.json"));
   const catalog = new SkillCatalog(new FakeReader());
   const runtime = new SkillsRuntime(store, catalog);
-  const ui = await startManagementUi(runtime, { port: 0 });
+  const ui = await startManagementUi(runtime, {
+    port: 0,
+    staticDirectory,
+  });
   return { runtime, ui };
 }
 
@@ -68,8 +79,7 @@ describe("management UI behavior", () => {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        id: "demo",
-        repository: "example/skills",
+        url: "https://github.com/example/skills",
       }),
     });
 
@@ -80,19 +90,19 @@ describe("management UI behavior", () => {
     );
     expect(sources).toEqual([
       {
-        id: "demo",
+        id: "example~skills",
         repository: "example/skills",
         enabled: true,
       },
     ]);
 
     const skills = await fetch(
-      `${ui.url}api/skills?source=demo`,
+      `${ui.url}api/skills?source=example~skills`,
     ).then((res) => res.json());
 
     expect(skills).toEqual([
       expect.objectContaining({
-        id: "demo/nested/demo",
+        id: "example~skills/nested/demo",
         name: "demo",
       }),
     ]);

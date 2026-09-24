@@ -87,9 +87,9 @@ export class SourceStore {
   }
 
   private validateSource(source: SkillSource): void {
-    if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(source.id)) {
+    if (!/^[A-Za-z0-9][A-Za-z0-9._~-]*$/.test(source.id)) {
       throw new Error(
-        "Source ID must contain only letters, numbers, dots, underscores, and hyphens",
+        "Source ID contains unsupported characters",
       );
     }
 

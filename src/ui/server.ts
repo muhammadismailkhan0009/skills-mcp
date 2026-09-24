@@ -1,7 +1,10 @@
+import { readFile } from "node:fs/promises";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import type { SkillsRuntime } from "../runtime/skills-runtime.js";
-import { MANAGEMENT_PAGE } from "./page.js";
+import { createGitHubSource } from "../sources/github-source.js";
 
 export interface ManagementUiHandle {
   url: string;
@@ -11,6 +14,7 @@ export interface ManagementUiHandle {
 export interface ManagementUiOptions {
   port?: number;
   host?: string;
+  staticDirectory?: string;
 }
 
 export async function startManagementUi(
@@ -19,9 +23,12 @@ export async function startManagementUi(
 ): Promise<ManagementUiHandle> {
   const host = options.host ?? "127.0.0.1";
   const port = options.port ?? 3218;
+  const staticDirectory =
+    options.staticDirectory ??
+    fileURLToPath(new URL("../web", import.meta.url));
 
   const server = createServer((request, response) => {
-    void handleRequest(runtime, request, response);
+    void handleRequest(runtime, staticDirectory, request, response);
   });
 
   await new Promise<void>((resolve, reject) => {
@@ -45,14 +52,18 @@ export async function startManagementUi(
 
 async function handleRequest(
   runtime: SkillsRuntime,
+  staticDirectory: string,
   request: IncomingMessage,
   response: ServerResponse,
 ): Promise<void> {
   try {
     const url = new URL(request.url ?? "/", "http://localhost");
 
-    if (request.method === "GET" && url.pathname === "/") {
-      sendText(response, 200, MANAGEMENT_PAGE, "text/html; charset=utf-8");
+    if (
+      request.method === "GET" &&
+      (url.pathname === "/" || url.pathname.startsWith("/assets/"))
+    ) {
+      await serveStaticFile(staticDirectory, url.pathname, response);
       return;
     }
 
@@ -63,7 +74,8 @@ async function handleRequest(
 
     if (request.method === "POST" && url.pathname === "/api/sources") {
       const body = await readJsonBody(request);
-      const source = parseNewSource(body);
+      const repositoryUrl = parseRepositoryUrl(body);
+      const source = createGitHubSource(repositoryUrl);
       await runtime.addSource(source);
       sendJson(response, 201, source);
       return;
@@ -160,25 +172,17 @@ async function readJsonBody(request: IncomingMessage): Promise<unknown> {
   }
 }
 
-function parseNewSource(body: unknown) {
+function parseRepositoryUrl(body: unknown): string {
   if (typeof body !== "object" || body === null) {
     throw new Error("Request body must be an object");
   }
 
   const candidate = body as Record<string, unknown>;
-  if (typeof candidate.id !== "string") throw new Error("id is required");
-  if (typeof candidate.repository !== "string") {
-    throw new Error("repository is required");
+  if (typeof candidate.url !== "string" || !candidate.url.trim()) {
+    throw new Error("GitHub repository URL is required");
   }
 
-  return {
-    id: candidate.id,
-    repository: candidate.repository,
-    ...(typeof candidate.ref === "string" && candidate.ref.trim()
-      ? { ref: candidate.ref }
-      : {}),
-    enabled: true,
-  };
+  return candidate.url;
 }
 function requireQuery(url: URL, name: string): string {
   const value = url.searchParams.get(name);
@@ -217,4 +221,52 @@ function closeServer(
   return new Promise((resolve, reject) => {
     server.close((error) => (error ? reject(error) : resolve()));
   });
+}
+
+async function serveStaticFile(
+  staticDirectory: string,
+  requestPath: string,
+  response: ServerResponse,
+): Promise<void> {
+  const relativePath =
+    requestPath === "/" ? "index.html" : requestPath.replace(/^\/+/, "");
+  const normalized = path.posix.normalize(relativePath);
+
+  if (
+    normalized === ".." ||
+    normalized.startsWith("../") ||
+    path.isAbsolute(normalized)
+  ) {
+    throw new Error("Invalid asset path");
+  }
+
+  const filePath = path.join(staticDirectory, normalized);
+  try {
+    const content = await readFile(filePath);
+    response.writeHead(200, {
+      "content-type": contentTypeFor(filePath),
+      "cache-control": normalized === "index.html" ? "no-store" : "public, max-age=31536000, immutable",
+      "x-content-type-options": "nosniff",
+    });
+    response.end(content);
+  } catch (error) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "ENOENT"
+    ) {
+      sendJson(response, 404, { error: "UI asset not found. Run the production build first." });
+      return;
+    }
+    throw error;
+  }
+}
+
+function contentTypeFor(filePath: string): string {
+  if (filePath.endsWith(".html")) return "text/html; charset=utf-8";
+  if (filePath.endsWith(".js")) return "text/javascript; charset=utf-8";
+  if (filePath.endsWith(".css")) return "text/css; charset=utf-8";
+  if (filePath.endsWith(".svg")) return "image/svg+xml";
+  return "application/octet-stream";
 }
