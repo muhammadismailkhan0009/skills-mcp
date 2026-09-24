@@ -14,7 +14,7 @@ MCP transport is stdio only.
 ## Run
 
 ```bash
-npx @myriadcode/skills-mcp
+npx @myriadcodelabslabs/skills-mcp
 ```
 
 The process also starts a loopback-only management UI at:
@@ -48,7 +48,7 @@ Example:
   "mcpServers": {
     "skills": {
       "command": "npx",
-      "args": ["-y", "@myriadcode/skills-mcp"]
+      "args": ["-y", "@myriadcodelabslabs/skills-mcp"]
     }
   }
 }
@@ -76,7 +76,7 @@ https://github.com/muhammadismailkhan0009/skills-mcp
 npm package:
 
 ```text
-@myriadcode/skills-mcp
+@myriadcodelabslabs/skills-mcp
 ```
 
 The repository includes:
@@ -110,10 +110,10 @@ git push -u origin main
 The npm package is scoped as:
 
 ```text
-@myriadcode/skills-mcp
+@myriadcodelabslabs/skills-mcp
 ```
 
-You must own the `@myriadcode` npm scope, either as your npm username or as an npm organization where you have publish permission. If you do not own that scope, change the package name before the first publish.
+You must own the `@myriadcodelabs` npm scope, either as your npm username or as an npm organization where you have publish permission. If you do not own that scope, change the package name before the first publish.
 
 Authenticate locally:
 
@@ -137,7 +137,7 @@ Using npm CLI requires npm 11.15.0 or newer:
 ```bash
 npm install --global "npm@^11.15.0"
 
-npm trust github @myriadcode/skills-mcp \
+npm trust github @myriadcodelabslabs/skills-mcp \
   --repo muhammadismailkhan0009/skills-mcp \
   --file release.yml \
   --allow-publish
@@ -167,7 +167,7 @@ The release workflow will:
 1. install dependencies
 2. run typecheck, tests, build, and npm package verification
 3. verify that tag `v0.1.0` matches package version `0.1.0`
-4. detect that `@myriadcode/skills-mcp@0.1.0` already exists on npm and skip duplicate publication
+4. detect that `@myriadcodelabslabs/skills-mcp@0.1.0` already exists on npm and skip duplicate publication
 5. create the GitHub Release with generated release notes
 
 ### Subsequent releases

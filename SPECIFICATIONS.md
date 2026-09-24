@@ -245,7 +245,7 @@ The project must be configured for publication to npm.
 It should provide a CLI executable so users can run:
 
 ```bash
-npx @myriadcode/skills-mcp
+npx @myriadcodelabslabs/skills-mcp
 ```
 
 or, after installing the package globally:

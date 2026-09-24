@@ -1,5 +1,5 @@
 {
-  "name": "@myriadcode/skills-mcp",
+  "name": "@myriadcodelabs/skills-mcp",
   "version": "0.1.0",
   "description": "A lightweight MCP server for exposing reusable skills from GitHub repositories",
   "main": "dist/index.js",
