@@ -66,6 +66,12 @@ export class SkillCatalog {
       .map((skill) => skill.metadata)
       .sort((a, b) => a.id.localeCompare(b.id));
   }
+
+  removeSource(sourceId: string): void {
+    for (const [id, skill] of this.skills) {
+      if (skill.source.id === sourceId) this.skills.delete(id);
+    }
+  }
   async readSkill(id: string): Promise<string> {
     const skill = this.requireSkill(id);
     return this.repositoryReader.readFile(skill.source, skill.skillFilePath);
