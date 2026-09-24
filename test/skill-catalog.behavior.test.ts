@@ -62,6 +62,34 @@ describe("skill catalog behavior", () => {
       "dev-skills/frontend/testing",
     ]);
     expect(skills.filter((skill) => skill.name === "testing")).toHaveLength(2);
+
+    // And hierarchy is exposed explicitly as derived scope metadata
+    expect(
+      skills
+        .filter((skill) => skill.name === "testing")
+        .map((skill) => ({ path: skill.path, scope: skill.scope })),
+    ).toEqual([
+      { path: "backend/java/testing", scope: "backend/java" },
+      { path: "frontend/testing", scope: "frontend" },
+    ]);
+  });
+
+  it("derives an empty scope for a skill directly under the repository root", async () => {
+    const catalog = new SkillCatalog(
+      new FakeRepositoryReader({
+        "feature-planning/SKILL.md":
+          "---\nname: feature-planning\ndescription: Plan features\n---\n# Planning",
+      }),
+    );
+
+    await catalog.refreshSource(source);
+
+    expect(catalog.listSkills()).toEqual([
+      expect.objectContaining({
+        path: "feature-planning",
+        scope: "",
+      }),
+    ]);
   });
 
   it("reads the complete SKILL.md for a discovered skill", async () => {

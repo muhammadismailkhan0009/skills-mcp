@@ -45,6 +45,7 @@ export class SkillCatalog {
         description,
         sourceId: source.id,
         path: root,
+        scope: this.deriveScope(root),
       };
 
       const resourcePaths = files
@@ -114,6 +115,11 @@ export class SkillCatalog {
     }
 
     return normalized;
+  }
+
+  private deriveScope(skillRoot: string): string {
+    const scope = POSIX.dirname(skillRoot);
+    return scope === "." ? "" : scope;
   }
 
   private isResourceOf(

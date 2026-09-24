@@ -34,6 +34,7 @@ interface Skill {
   description: string;
   sourceId: string;
   path: string;
+  scope: string;
 }
 
 interface SkillDetail {
@@ -381,9 +382,14 @@ export default function App() {
                               <span className="block truncate text-sm font-medium">
                                 {skill.name}
                               </span>
-                              <span className="block truncate text-xs text-muted-foreground">
-                                {skill.description || skill.path}
+                              <span className="block truncate text-xs font-medium text-muted-foreground">
+                                {skill.scope || "repository root"}
                               </span>
+                              {skill.description && (
+                                <span className="mt-0.5 block truncate text-xs text-muted-foreground">
+                                  {skill.description}
+                                </span>
+                              )}
                             </span>
                             {busy === skill.id && (
                               <Loader2 className="ml-auto mt-0.5 size-4 animate-spin" />
@@ -398,7 +404,10 @@ export default function App() {
                         <div className="border-b px-4 py-3">
                           <div className="font-medium">{skillDetail.metadata.name}</div>
                           <div className="mt-1 text-xs text-muted-foreground">
-                            {skillDetail.metadata.path}
+                            Scope: {skillDetail.metadata.scope || "repository root"}
+                          </div>
+                          <div className="mt-0.5 text-xs text-muted-foreground">
+                            Path: {skillDetail.metadata.path}
                           </div>
                         </div>
 

@@ -6,6 +6,7 @@ export interface SkillMetadata {
   description: string;
   sourceId: string;
   path: string;
+  scope: string;
 }
 
 export interface IndexedSkill {

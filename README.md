@@ -32,6 +32,8 @@ https://github.com/muhammadismailkhan0009/dev-skills
 ```
 
 The server derives its internal source identity automatically and uses the repository's default branch.
+
+Skill names do not need to be globally unique. Every discovered skill also exposes a derived `scope` from its parent repository path. For example, two skills named `feature-planning` can remain distinct as `backend/java` and `frontend/nextjs`, while the canonical skill ID remains the exact machine identity.
 ## Configuration
 
 Repository configuration is persisted at:

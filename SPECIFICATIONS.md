@@ -82,6 +82,24 @@ Example:
 ```text
 muhammadismailkhan0009~dev-skills/backend/java/spring/spring-api
 ```
+
+Each skill also exposes a derived `scope`. Scope is the parent path of the skill root and is never read from or written to `SKILL.md`.
+
+Examples:
+
+```text
+path:  backend/java/feature-planning
+scope: backend/java
+
+path:  frontend/nextjs/feature-planning
+scope: frontend/nextjs
+
+path:  feature-planning
+scope: ""
+```
+
+Duplicate skill names are valid. Clients must use the canonical ID for exact identity and may use `scope` to present or select the appropriate hierarchical context.
+
 ## Skill Structure
 
 A typical skill may contain:
@@ -123,6 +141,7 @@ Each result should include at least:
 - description
 - source ID
 - repository-relative skill path
+- derived hierarchical scope
 
 The returned skill ID is used by the other MCP tools.
 

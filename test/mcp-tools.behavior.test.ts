@@ -84,6 +84,16 @@ describe("MCP skill tools behavior", () => {
     expect(listText?.type).toBe("text");
     if (listText?.type !== "text") throw new Error("Expected text result");
     expect(listText.text).toContain("dev-skills/backend/api");
+    const listedSkills = JSON.parse(listText.text) as Array<{
+      id: string;
+      scope: string;
+    }>;
+    expect(listedSkills).toContainEqual(
+      expect.objectContaining({
+        id: "dev-skills/backend/api",
+        scope: "backend",
+      }),
+    );
 
     const read = await client.callTool({
       name: "read_skill",

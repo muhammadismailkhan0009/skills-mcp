@@ -104,6 +104,7 @@ describe("management UI behavior", () => {
       expect.objectContaining({
         id: "example~skills/nested/demo",
         name: "demo",
+        scope: "nested",
       }),
     ]);
   });
